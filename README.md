@@ -38,7 +38,7 @@ QR element and the confirmation code instead.
 ## Setup
 
     python3 -m venv .venv
-    .venv/bin/pip install flask playwright
+    .venv/bin/pip install -r requirements.txt
     .venv/bin/playwright install chromium
     brew install cloudflared
 
@@ -58,6 +58,15 @@ Create `.env.sh` (mode 600, git-ignored):
     source .env.sh && .venv/bin/python3 app.py add-friend "Name"   # prints a private link
     .venv/bin/python3 app.py list
     .venv/bin/python3 app.py seed "Friend" "Name|email|PLATE|TX|Make|Model|Color" ...
+
+## Deploy
+
+- CI runs the smoke tests on every push and pull request. It never opens a browser.
+- To ship on the Mac, run `scripts/update.sh`. It pulls, installs `requirements.txt`, checks the code
+  compiles and restarts the app. It refuses if the folder has local changes, or if a renewal is
+  running or due in the next 10 minutes.
+- Run the tests locally: `pip install -r requirements.txt -r requirements-dev.txt && pytest -q tests`.
+  They use a temp database and the mock worker, so they never touch the property's site.
 
 ## Testing tools
 

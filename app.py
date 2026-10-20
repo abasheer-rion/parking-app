@@ -20,7 +20,7 @@ from flask import Flask, abort, redirect, render_template_string, request, send_
 import worker
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DB = os.path.join(HERE, "data.db")
+DB = os.environ.get("PARKING_DB", os.path.join(HERE, "data.db"))
 MAX_DAYS = int(os.environ.get("MAX_DAYS", "14"))
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:8080")
 RENEW_WITHIN = 2 * 3600          # renew when under 2 hours of coverage remain
