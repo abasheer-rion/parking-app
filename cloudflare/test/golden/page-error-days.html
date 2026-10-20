@@ -1,0 +1,159 @@
+
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guest parking</title>
+<meta http-equiv="refresh" content="6">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+ :root{--pink:#ff8fb8;--hot:#ff4f8b;--cream:#fff3f8;--ink:#5b2a45;--mint:#6fdcb6}
+ *{box-sizing:border-box;image-rendering:pixelated}
+ body{font-family:'VT323',monospace;font-size:21px;background:var(--pink);color:var(--ink);margin:0;
+  background-image:radial-gradient(#ffb3cf 2px,transparent 2px);background-size:22px 22px}
+ main{max-width:460px;margin:0 auto;padding:22px 14px 70px}
+ h1{font-family:'Press Start 2P',monospace;font-size:17px;line-height:1.5;margin:6px 0 6px;color:#fff;
+  text-shadow:3px 3px 0 var(--hot);text-align:center}
+ p.sub{margin:0 0 18px;text-align:center;color:#fff;text-shadow:1px 1px 0 var(--hot)}
+ .card{background:var(--cream);padding:16px;margin:16px 0;border:4px solid var(--ink);
+  box-shadow:6px 6px 0 var(--hot)}
+ .card>b,.card b.t{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--hot);display:block;margin-bottom:6px}
+ label{display:block;margin:10px 0 3px}
+ input,select{width:100%;font-family:'VT323',monospace;font-size:22px;padding:8px 10px;color:var(--ink);
+  background:#fff;border:3px solid var(--ink);border-radius:0;outline:none}
+ input:focus,select:focus{border-color:var(--hot);box-shadow:3px 3px 0 var(--pink)}
+ button{width:100%;font-family:'Press Start 2P',monospace;font-size:11px;padding:14px 8px;margin-top:14px;
+  background:var(--hot);color:#fff;border:3px solid var(--ink);border-radius:0;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+ button.alt{background:#fff;color:var(--ink);margin-top:10px}
+ .row{display:flex;gap:10px}.row>div{flex:1}
+ .ok{color:#0d8a62}.bad{color:#c0143c}.mut{opacity:.75}
+ .who{border-top:3px dashed var(--pink);padding-top:12px;margin-top:12px}.who:first-of-type{border-top:0;padding-top:0;margin-top:0}
+ .name{font-family:'Press Start 2P',monospace;font-size:12px}
+ details{margin-top:10px}summary{cursor:pointer;color:var(--hot)}
+ .heart{display:inline-block;animation:beat 1.2s steps(2) infinite}
+ @keyframes beat{50%{transform:scale(1.25)}}
+</style></head><body><main>
+<h1><span class="heart">♥</span> Park With Love <span class="heart">♥</span></h1><p class="sub">Hi Pat O&#39;Neil &amp; &lt;Co&gt;, saving you a spot at SAMPLE COURT, unit 101</p>
+
+
+<div class="card"><span class="bad">Days must be a number.</span></div>
+
+<div class="card"><b class="t">♥ Who's coming</b>
+
+ <div class="who">
+  <span class="name">Pat</span><br>
+  <span class="mut">ABC1234 TX · Blue Honda Civic</span>
+  
+  <form method="post" action="/u/tok-alpha-123/profile/1/go">
+   <div class="row"><div style="max-width:110px"><label>Days</label><input name="days" type="number" min="1" max="14" value="1"></div>
+   <div><button>Save my spot ♥</button></div></div></form>
+  
+  <details><summary>Edit</summary>
+   <form method="post" action="/u/tok-alpha-123/profile/1/save">
+    <label>Name</label><input name="name" required value="Pat">
+    <label>Email, for problem alerts</label><input name="email" type="email" value="pat@example.com">
+    <div class="row"><div><label>Plate</label><input name="plate" autocapitalize="characters" value="ABC1234"></div>
+    <div><label>State</label><select name="state"><option selected>TX</option><option >AL</option><option >AK</option><option >AZ</option><option >AR</option><option >CA</option><option >CO</option><option >CT</option><option >DE</option><option >FL</option><option >GA</option><option >HI</option><option >ID</option><option >IL</option><option >IN</option><option >IA</option><option >KS</option><option >KY</option><option >LA</option><option >ME</option><option >MD</option><option >MA</option><option >MI</option><option >MN</option><option >MS</option><option >MO</option><option >MT</option><option >NE</option><option >NV</option><option >NH</option><option >NJ</option><option >NM</option><option >NY</option><option >NC</option><option >ND</option><option >OH</option><option >OK</option><option >OR</option><option >PA</option><option >RI</option><option >SC</option><option >SD</option><option >TN</option><option >UT</option><option >VT</option><option >VA</option><option >WA</option><option >WV</option><option >WI</option><option >WY</option><option >DC</option></select></div></div>
+    <div class="row"><div><label>Make</label><input name="make" value="Honda"></div><div><label>Model</label><input name="model" value="Civic"></div></div>
+    <label>Color</label><input name="color" value="Blue">
+    <button>Save changes</button></form>
+   <form method="post" action="/u/tok-alpha-123/profile/1/delete"><button class="alt">Remove Pat</button></form>
+  </details>
+ </div>
+
+ <div class="who">
+  <span class="name">Sam &#34;Quotes&#34;</span><br>
+  <span class="mut">No car saved yet</span>
+  <br><span class="bad">Open Edit and add a car and an email to register.</span>
+  <details><summary>Edit</summary>
+   <form method="post" action="/u/tok-alpha-123/profile/2/save">
+    <label>Name</label><input name="name" required value="Sam &#34;Quotes&#34;">
+    <label>Email, for problem alerts</label><input name="email" type="email" value="">
+    <div class="row"><div><label>Plate</label><input name="plate" autocapitalize="characters" value=""></div>
+    <div><label>State</label><select name="state"><option selected>TX</option><option >AL</option><option >AK</option><option >AZ</option><option >AR</option><option >CA</option><option >CO</option><option >CT</option><option >DE</option><option >FL</option><option >GA</option><option >HI</option><option >ID</option><option >IL</option><option >IN</option><option >IA</option><option >KS</option><option >KY</option><option >LA</option><option >ME</option><option >MD</option><option >MA</option><option >MI</option><option >MN</option><option >MS</option><option >MO</option><option >MT</option><option >NE</option><option >NV</option><option >NH</option><option >NJ</option><option >NM</option><option >NY</option><option >NC</option><option >ND</option><option >OH</option><option >OK</option><option >OR</option><option >PA</option><option >RI</option><option >SC</option><option >SD</option><option >TN</option><option >UT</option><option >VT</option><option >VA</option><option >WA</option><option >WV</option><option >WI</option><option >WY</option><option >DC</option></select></div></div>
+    <div class="row"><div><label>Make</label><input name="make" value=""></div><div><label>Model</label><input name="model" value=""></div></div>
+    <label>Color</label><input name="color" value="">
+    <button>Save changes</button></form>
+   <form method="post" action="/u/tok-alpha-123/profile/2/delete"><button class="alt">Remove Sam &#34;Quotes&#34;</button></form>
+  </details>
+ </div>
+
+ <div class="who">
+  <span class="name">Lee</span><br>
+  <span class="mut">XYZ9 CA · Grey VW Jetta</span>
+  
+  <form method="post" action="/u/tok-alpha-123/profile/3/go">
+   <div class="row"><div style="max-width:110px"><label>Days</label><input name="days" type="number" min="1" max="14" value="1"></div>
+   <div><button>Save my spot ♥</button></div></div></form>
+  
+  <details><summary>Edit</summary>
+   <form method="post" action="/u/tok-alpha-123/profile/3/save">
+    <label>Name</label><input name="name" required value="Lee">
+    <label>Email, for problem alerts</label><input name="email" type="email" value="lee@example.com">
+    <div class="row"><div><label>Plate</label><input name="plate" autocapitalize="characters" value="XYZ9"></div>
+    <div><label>State</label><select name="state"><option >TX</option><option >AL</option><option >AK</option><option >AZ</option><option >AR</option><option selected>CA</option><option >CO</option><option >CT</option><option >DE</option><option >FL</option><option >GA</option><option >HI</option><option >ID</option><option >IL</option><option >IN</option><option >IA</option><option >KS</option><option >KY</option><option >LA</option><option >ME</option><option >MD</option><option >MA</option><option >MI</option><option >MN</option><option >MS</option><option >MO</option><option >MT</option><option >NE</option><option >NV</option><option >NH</option><option >NJ</option><option >NM</option><option >NY</option><option >NC</option><option >ND</option><option >OH</option><option >OK</option><option >OR</option><option >PA</option><option >RI</option><option >SC</option><option >SD</option><option >TN</option><option >UT</option><option >VT</option><option >VA</option><option >WA</option><option >WV</option><option >WI</option><option >WY</option><option >DC</option></select></div></div>
+    <div class="row"><div><label>Make</label><input name="make" value="VW"></div><div><label>Model</label><input name="model" value="Jetta"></div></div>
+    <label>Color</label><input name="color" value="Grey">
+    <button>Save changes</button></form>
+   <form method="post" action="/u/tok-alpha-123/profile/3/delete"><button class="alt">Remove Lee</button></form>
+  </details>
+ </div>
+
+ <details><summary>Add someone</summary>
+  <form method="post" action="/u/tok-alpha-123/profile/new">
+   <label>Name</label><input name="name" required>
+   <label>Email, for problem alerts</label><input name="email" type="email">
+   <div class="row"><div><label>Plate</label><input name="plate" autocapitalize="characters"></div>
+   <div><label>State</label><select name="state"><option>TX</option><option>AL</option><option>AK</option><option>AZ</option><option>AR</option><option>CA</option><option>CO</option><option>CT</option><option>DE</option><option>FL</option><option>GA</option><option>HI</option><option>ID</option><option>IL</option><option>IN</option><option>IA</option><option>KS</option><option>KY</option><option>LA</option><option>ME</option><option>MD</option><option>MA</option><option>MI</option><option>MN</option><option>MS</option><option>MO</option><option>MT</option><option>NE</option><option>NV</option><option>NH</option><option>NJ</option><option>NM</option><option>NY</option><option>NC</option><option>ND</option><option>OH</option><option>OK</option><option>OR</option><option>PA</option><option>RI</option><option>SC</option><option>SD</option><option>TN</option><option>UT</option><option>VT</option><option>VA</option><option>WA</option><option>WV</option><option>WI</option><option>WY</option><option>DC</option></select></div></div>
+   <div class="row"><div><label>Make</label><input name="make"></div><div><label>Model</label><input name="model"></div></div>
+   <label>Color</label><input name="color">
+   <button>Add</button></form>
+ </details>
+</div>
+
+
+<div class="card">
+ <b class="t" style="font-size:13px">LAST01</b> <span class="mut">Mini Cooper</span><br>
+ <span class="ok">♥ You are all set</span><br>
+  <span class="mut">Spot saved until Sun Nov 01, 01:20 AM. Stay ends Sun Nov 01, 01:30 AM.</span>
+  <br><label>Confirmation code</label><b style="word-break:break-all">RMP-LAST</b>
+  
+  
+ <form method="post" action="/u/tok-alpha-123/stop/5"><button class="alt">Done staying</button></form>
+</div>
+
+<div class="card">
+ <b class="t" style="font-size:13px">BAD666</b> <span class="mut">Kia Soul</span><br>
+ <span class="bad">Failed: TimeoutError: &lt;boom&gt; &amp; more</span>
+ 
+ <form method="post" action="/u/tok-alpha-123/stop/4"><button class="alt">Done staying</button></form>
+</div>
+
+<div class="card">
+ <b class="t" style="font-size:13px">XYZ9</b> <span class="mut">VW Jetta</span><br>
+ <span class="mut">Saving your spot now, this page updates on its own.</span>
+ 
+ <form method="post" action="/u/tok-alpha-123/stop/3"><button class="alt">Done staying</button></form>
+</div>
+
+<div class="card">
+ <b class="t" style="font-size:13px">ABC1234</b> <span class="mut">Honda Civic</span><br>
+ <span class="ok">♥ You are all set</span><br>
+  <span class="mut">Spot saved until Tue Oct 20, 11:30 PM. Stay ends Mon Nov 02, 02:00 PM.</span>
+  <br><label>Confirmation code</label><b style="word-break:break-all">RMP-ABC-998877</b>
+  <br><img src="/u/tok-alpha-123/qr/2" alt="QR code" style="width:200px;max-width:100%;margin-top:8px;border:3px solid var(--ink);background:#fff">
+  
+ <form method="post" action="/u/tok-alpha-123/stop/2"><button class="alt">Done staying</button></form>
+</div>
+
+
+
+<div class="card"><b class="t">♥ New ride</b>
+<form method="post" action="/u/tok-alpha-123/register">
+ <label>Your email, for problem alerts</label><input name="email" type="email" required value="last@example.com">
+ <div class="row"><div><label>Plate</label><input name="plate" required autocapitalize="characters"></div>
+ <div><label>State</label><select name="state" required><option>TX</option><option>AL</option><option>AK</option><option>AZ</option><option>AR</option><option>CA</option><option>CO</option><option>CT</option><option>DE</option><option>FL</option><option>GA</option><option>HI</option><option>ID</option><option>IL</option><option>IN</option><option>IA</option><option>KS</option><option>KY</option><option>LA</option><option>ME</option><option>MD</option><option>MA</option><option>MI</option><option>MN</option><option>MS</option><option>MO</option><option>MT</option><option>NE</option><option>NV</option><option>NH</option><option>NJ</option><option>NM</option><option>NY</option><option>NC</option><option>ND</option><option>OH</option><option>OK</option><option>OR</option><option>PA</option><option>RI</option><option>SC</option><option>SD</option><option>TN</option><option>UT</option><option>VT</option><option>VA</option><option>WA</option><option>WV</option><option>WI</option><option>WY</option><option>DC</option></select></div></div>
+ <div class="row"><div><label>Make</label><input name="make" required></div><div><label>Model</label><input name="model" required></div></div>
+ <label>Color</label><input name="color" required>
+ <label>Days staying (up to 14)</label><input name="days" type="number" min="1" max="14" value="1" required>
+ <button>Save my spot ♥</button></form></div>
+</main></body></html>

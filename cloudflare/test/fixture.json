@@ -1,0 +1,31 @@
+{
+ "friends": [
+  {"id": 1, "token": "tok-alpha-123", "name": "Pat O'Neil & <Co>"},
+  {"id": 2, "token": "tok-empty-456", "name": "Empty Friend"}
+ ],
+ "profiles": [
+  {"id": 1, "friend_id": 1, "name": "Pat", "email": "pat@example.com", "plate": "ABC1234", "state": "TX", "make": "Honda", "model": "Civic", "color": "Blue"},
+  {"id": 2, "friend_id": 1, "name": "Sam \"Quotes\"", "email": "", "plate": "", "state": "TX", "make": "", "model": "", "color": ""},
+  {"id": 3, "friend_id": 1, "name": "Lee", "email": "lee@example.com", "plate": "XYZ9", "state": "CA", "make": "VW", "model": "Jetta", "color": "Grey"}
+ ],
+ "jobs": [
+  {"id": 1, "friend_id": 1, "plate": "OLD111", "state": "TX", "make": "Ford", "model": "Focus", "color": "Red", "email": "old@example.com",
+   "start_ts": 1792505100, "end_ts": 1792557000, "expires_ts": 1792557000, "last_ok_ts": 1792505100, "status": "done", "fails": 0, "who": "Pat"},
+  {"id": 2, "friend_id": 1, "plate": "ABC1234", "state": "TX", "make": "Honda", "model": "Civic", "color": "Blue", "email": "pat@example.com",
+   "start_ts": 1792505100, "end_ts": 1793649600, "expires_ts": 1792557000, "last_ok_ts": 1792505100, "status": "active", "fails": 0,
+   "confirmation": "RMP-ABC-998877", "qr": true, "who": "Pat"},
+  {"id": 3, "friend_id": 1, "plate": "XYZ9", "state": "CA", "make": "VW", "model": "Jetta", "color": "Grey", "email": "lee@example.com",
+   "start_ts": 1792505100, "end_ts": 1792643460, "status": "pending", "fails": 0, "who": "Lee"},
+  {"id": 4, "friend_id": 1, "plate": "BAD666", "state": "TX", "make": "Kia", "model": "Soul", "color": "Green", "email": "bad@example.com",
+   "start_ts": 1792505100, "end_ts": 1793514600, "status": "failed", "fails": 5, "error": "TimeoutError: <boom> & more", "who": "Pat"},
+  {"id": 5, "friend_id": 1, "plate": "LAST01", "state": "TX", "make": "Mini", "model": "Cooper", "color": "White", "email": "last@example.com",
+   "start_ts": 1792505100, "end_ts": 1793514600, "expires_ts": 1793514000, "last_ok_ts": 1793427600, "status": "active", "fails": 0,
+   "confirmation": "RMP-LAST", "who": null}
+ ],
+ "mails": [
+  {"name": "success-first", "kind": "success", "job": 2, "first": true},
+  {"name": "success-renew-last-day", "kind": "success", "job": 5, "first": false},
+  {"name": "fail-first-retry", "kind": "failure", "job": 3, "first": true, "fails": 1, "reason": "TimeoutError: page <did> not load", "gave_up": false},
+  {"name": "fail-renew-gave-up", "kind": "failure", "job": 2, "first": false, "fails": 5, "reason": "site did not confirm: something went wrong on the site and this message is quite long so it gets cut somewhere around here to make sure slicing works the same in both apps when reasons go past two hundred characters and then three hundred characters which is the plain text cut off point for the reason line in the email body", "gave_up": true}
+ ]
+}

@@ -1,0 +1,9 @@
+node_modules/
+.wrangler/
+.dev.vars*
+.env*
+# private test link, made by scripts/add-friend.sh --save
+.test-token
+# exports hold personal data
+*.sql
+!migrations/*.sql

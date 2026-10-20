@@ -7,7 +7,8 @@ Friends open a private link, pick a saved profile, choose how many days, and the
 their car with the property, then renews it every day until the stay ends. It emails the
 confirmation code and QR code after each registration or renewal, and emails when a renewal fails.
 
-See HANDOFF.md for current status and open work.
+See HANDOFF.md for current status and open work. A Cloudflare Worker port, not live yet, is in
+`cloudflare/` (see `cloudflare/README.md`).
 
 ## How it works
 

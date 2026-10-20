@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "parking-app",
+  "main": "src/index.ts",
+  // nodejs_compat and a date from 2025-09-15 on are needed by @cloudflare/playwright.
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Only the workers.dev address for now. Cutover adds a route for parking.endyland.com (see README).
+  "workers_dev": true,
+  "preview_urls": false,
+  "triggers": { "crons": ["* * * * *"] },
+  "browser": { "binding": "BROWSER" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "parking-app",
+      "database_id": "3092d7b2-b003-4941-8060-0f4503f402df",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "MAX_DAYS": "14",
+    "PROPERTY": "SAMPLE COURT",
+    "UNIT": "101",
+    "FROM_NAME": "Park With Love (no reply)",
+    // "1" until cutover: the Mac app is still the one that registers cars.
+    "PAUSE_REGISTRATIONS": "1"
+  },
+  "observability": { "enabled": true }
+}
