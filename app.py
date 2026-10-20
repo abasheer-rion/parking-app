@@ -374,6 +374,26 @@ def start_job(f, data, days):
     threading.Thread(target=run_registration, args=(jid,), daemon=True).start()
 
 
+@app.after_request
+def harden(resp):
+    """Private tool: keep it out of search engines and other sites' frames."""
+    resp.headers["X-Robots-Tag"] = "noindex, nofollow"
+    resp.headers["X-Content-Type-Options"] = "nosniff"
+    resp.headers["X-Frame-Options"] = "DENY"
+    resp.headers["Referrer-Policy"] = "no-referrer"
+    resp.headers["Content-Security-Policy"] = ("default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+                                               "font-src https://fonts.gstatic.com; img-src 'self' data:; frame-ancestors 'none'; "
+                                               "form-action 'self'; base-uri 'none'")
+    if request.path.startswith("/u/"):
+        resp.headers["Cache-Control"] = "no-store"
+    return resp
+
+
+@app.route("/robots.txt")
+def robots():
+    return "User-agent: *\nDisallow: /\n", 200, {"Content-Type": "text/plain"}
+
+
 @app.route("/u/<token>")
 def home(token):
     return page(friend_or_404(token))
