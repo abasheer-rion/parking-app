@@ -1,0 +1,19 @@
+# secrets and local config
+.env
+.env.*
+*.env.sh
+.env.sh
+
+# live data: friends, plates, emails, link tokens
+data.db
+*.db
+
+# screenshots, QR codes, result pages, tunnel logs
+logs/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+
+.DS_Store
