@@ -18,3 +18,6 @@ __pycache__/
 
 .DS_Store
 .pytest_cache/
+
+# plists moved out of ~/Library/LaunchAgents at cutover
+launchd/disabled/

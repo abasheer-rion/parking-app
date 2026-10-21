@@ -63,6 +63,14 @@ To refresh the golden files after changing the Flask app's HTML or emails, use a
 
 ## Deploy
 
+A push to `main` that changes `cloudflare/` deploys it: `.github/workflows/deploy.yml` installs,
+typechecks, tests, applies D1 migrations, then runs `wrangler deploy`. It needs `CLOUDFLARE_API_TOKEN`
+(secret) and `CLOUDFLARE_ACCOUNT_ID` (variable) in the GitHub environment `cloudflare`. Until the
+token is set it skips with a notice. The owner sets it with `platform/github/owner-set-secrets.sh`
+in endyland-infra. Every deploy uses `wrangler.jsonc` as it is on `main`, routes included.
+
+By hand, only if the pipeline is down:
+
     export CLOUDFLARE_ACCOUNT_ID=ba15337853352a33fd60d311715146c1
     export CLOUDFLARE_API_TOKEN="$(vault get cloudflare-api-token)"
     npx wrangler d1 migrations apply parking-app --remote
@@ -102,21 +110,50 @@ One test friend, "Worker Test (not a real person)", is in the remote D1. Its pri
 
 ## Cutover
 
+Not before 23:35 on 2026-10-20.
+
 1. Pick a time with no renewal due in the next 30 minutes (`scripts/update.sh` in the parent folder
    shows how to check).
 2. Run `scripts/set-secrets.sh`.
-3. Stop the Mac app (launchd or kill). Leave its files, `data.db` and the tunnel in place.
+3. Stop the Mac app and its tunnel. Both plists have `KeepAlive`, so killing the process is not enough:
+   launchd starts it again. Unload both, then move the plists out so they do not come back at login:
+
+       launchctl bootout gui/$(id -u)/com.endyland.parking-app
+       launchctl bootout gui/$(id -u)/com.endyland.parking-tunnel
+       mkdir -p ~/parking-app/launchd/disabled
+       mv ~/Library/LaunchAgents/com.endyland.parking-app.plist \
+          ~/Library/LaunchAgents/com.endyland.parking-tunnel.plist ~/parking-app/launchd/disabled/
+       launchctl list | grep com.endyland.parking    # should print nothing
+
+   Leave the app files, `data.db` and the tunnel config in place.
 4. Move the data (above), after deleting the test friend.
 5. In `wrangler.jsonc`, set `PAUSE_REGISTRATIONS` to `"0"` and add the route:
 
        "routes": [{ "pattern": "parking.endyland.com/*", "zone_name": "endyland.com" }]
 
-   Then `npx wrangler deploy`. The route sends parking.endyland.com to the Worker instead of the tunnel.
+   Commit and push to `main`. The Deploy Worker workflow deploys it. The route sends
+   parking.endyland.com to the Worker instead of the tunnel.
+   The route must live in `wrangler.jsonc`, not only in the dashboard: every auto-deploy applies the
+   routes in `wrangler.jsonc`, so this keeps it in place.
    The firewall rules already allow `/u/*` and `/robots.txt`, so nothing else changes. Links stay the same.
 6. Open a friend link and check it. Watch `npx wrangler tail parking-app` around the next renewal.
 
-Rollback: remove the route (dashboard, or delete `routes` and redeploy), set `PAUSE_REGISTRATIONS`
-back to `"1"`, start the Mac app. The tunnel serves the site again at once.
+## Rollback
+
+1. Remove the route from `wrangler.jsonc` and set `PAUSE_REGISTRATIONS` back to `"1"`. Commit and push
+   to `main`. If the pipeline is slow or down, also delete the route in the dashboard
+   (Workers, `parking-app`, Settings, Domains and Routes). Deleting it only in the dashboard is not
+   enough: the next deploy from `main` puts it back if it is still in `wrangler.jsonc`.
+2. Put the plists back and start both:
+
+       mv ~/parking-app/launchd/disabled/com.endyland.parking-app.plist \
+          ~/parking-app/launchd/disabled/com.endyland.parking-tunnel.plist ~/Library/LaunchAgents/
+       launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.endyland.parking-app.plist
+       launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.endyland.parking-tunnel.plist
+       launchctl list | grep com.endyland.parking    # both listed
+
+   The tunnel serves the site again once the route is gone.
+
 Keep the Mac app stopped but in place for a week. Its data is frozen at the cutover, so after a
 rollback, anything people changed on the Worker in between has to be entered again.
 
@@ -126,7 +163,7 @@ Nightly: `.github/workflows/backup.yml` runs at 08:15 UTC, exports D1 with
 `wrangler d1 export parking-app --remote`, gzips it and keeps it as a private artifact for 30 days.
 It needs `CLOUDFLARE_API_TOKEN` as a secret in the GitHub environment `cloudflare`
 (a token with Account, D1, Edit). Until then it skips with a notice.
-Set it with `env -u GITHUB_TOKEN gh secret set CLOUDFLARE_API_TOKEN --env cloudflare`.
+The owner sets it with `platform/github/owner-set-secrets.sh` in endyland-infra.
 
 Time Travel (D1's built-in undo, 7 days on the free plan, 30 on paid):
 
