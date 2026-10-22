@@ -2,7 +2,7 @@
 import { friendByToken, JOB_COLS, type Friend, type Job, type Profile } from "./db";
 import type { Env } from "./env";
 import { settings } from "./env";
-import { BAD_REQUEST, NOT_ALLOWED, NOT_FOUND, pyTitle, redirectBody, renderPage } from "./page";
+import { BAD_REQUEST, NOT_ALLOWED, NOT_FOUND, pyTitle, redirectBody, renderPage, type PastStay } from "./page";
 import { now } from "./time";
 
 const CSP = "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
@@ -72,16 +72,20 @@ async function friendOr404(env: Env, token: string): Promise<Friend> {
 }
 
 async function page(env: Env, f: Friend, notice: string | null = null, error: string | null = null): Promise<Response> {
-  const [active, recent, profiles] = await env.DB.batch([
+  const [active, recent, profiles, past] = await env.DB.batch([
     env.DB.prepare(`SELECT ${JOB_COLS} FROM jobs WHERE friend_id=? AND status IN ('pending','active','failed') ORDER BY id DESC`).bind(f.id),
     env.DB.prepare("SELECT email FROM jobs WHERE id IN (SELECT MAX(id) FROM jobs WHERE friend_id=? GROUP BY plate) " +
       "ORDER BY id DESC LIMIT 1").bind(f.id),
     env.DB.prepare("SELECT * FROM profiles WHERE friend_id=? ORDER BY id").bind(f.id),
+    // Finished stays. Failed ones still show above until "Done staying", so they wait until then.
+    env.DB.prepare("SELECT id,plate,start_ts,end_ts,confirmation FROM jobs WHERE friend_id=? " +
+      "AND status NOT IN ('pending','active','failed') ORDER BY id DESC LIMIT 20").bind(f.id),
   ]);
   const s = settings(env);
   const last = (recent.results[0] as { email: string | null } | undefined)?.email;
   return html(renderPage({
     friend: f, profiles: profiles.results as unknown as Profile[], active: active.results as unknown as (Job & { has_qr: number })[],
+    past: past.results as unknown as PastStay[],
     lastEmail: recent.results.length ? (last ?? "None") : "", notice, error,
     maxDays: s.maxDays, unit: s.unit, prop: pyTitle(s.property),
   }));

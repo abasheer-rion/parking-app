@@ -1,7 +1,11 @@
 // The friend page, ported line for line from the Flask app's PAGE template.
 // Whitespace matches the Jinja output, so test/golden can compare them directly.
+// The "Past stays" card is new here: the Flask app never had it.
 import { fmt } from "./time";
 import type { Friend, Job, Profile } from "./db";
+
+/** A finished stay. No column counts renewals, so none is shown. */
+export type PastStay = Pick<Job, "id" | "plate" | "start_ts" | "end_ts" | "confirmation">;
 
 export const STATES = ["TX", "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY",
   "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH",
@@ -30,6 +34,7 @@ export interface PageData {
   friend: Friend;
   profiles: Profile[];
   active: (Job & { has_qr: number })[];
+  past: PastStay[];
   lastEmail: string;
   notice?: string | null;
   error?: string | null;
@@ -153,6 +158,16 @@ ${d.error ? `<div class="card"><span class="bad">${e(d.error)}</span></div>` : "
 </div>
 `);
   }
+  o.push(`
+<div class="card"><b class="t">♥ Past stays</b>
+${d.past.length ? d.past.map((j) => `
+ <div class="who">
+  <span class="name">${e(j.plate)}</span><br>
+  <span class="mut">${e(fmt(j.start_ts))} to ${e(fmt(j.end_ts))}</span>${j.confirmation ? `<br>
+  <span class="mut">Code ${e(j.confirmation)}</span>` : ""}
+ </div>`).join("") : `<span class="mut">No past stays yet.</span>`}
+</div>
+`);
   o.push(`
 
 
