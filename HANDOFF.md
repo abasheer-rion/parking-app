@@ -1,26 +1,32 @@
-# Handoff (as of 2026-10-20)
+# Handoff (as of 2026-10-22)
 
 Read README.md first. This file is what is running, what is pending, and the decisions behind it.
 
-## Running now
+## Running now (as of 2026-10-22)
 
-- On Ayan's MacBook Pro at `~/parking-app`, currently started with nohup.
-- Public address: https://parking.endyland.com through the named tunnel `parking-app`
-  (id 17b16696-2dea-4e93-8e17-73595e0db5e8, ingress managed in Cloudflare). `run-tunnel.sh`
-  fetches the tunnel token at start using the vault's Cloudflare token.
-- Auto-start: `launchd/install.sh` installs login agents for the app and the tunnel. It must be run
-  by the owner (an agent install was blocked for Claude). Until then a reboot stops everything.
-- Links: `source .env.sh && .venv/bin/python3 app.py list`.
+- On the Cloudflare Worker `parking-app`, code in `cloudflare/`. Route `parking.endyland.com/*` is
+  in `cloudflare/wrangler.jsonc`. Data is in D1 `parking-app` (copied from `data.db`: 1 friend,
+  3 profiles, 2 jobs). Registrations are on.
+- Deploys: push to `main`. The GitHub Actions "Deploy Worker" workflow does the rest (route went
+  live in commit c1ec96a).
+- Email: the Worker sends through Gmail SMTP with secrets `GMAIL_USER` and `GMAIL_APP_PASSWORD`.
+- Backups: nightly D1 backups in GitHub Actions (`backup.yml`).
+- The Mac app and its tunnel are off. The launchd jobs `com.endyland.parking-app` and
+  `com.endyland.parking-tunnel` were booted out and their plists moved to `launchd/disabled/`.
+- `app.py`, `worker.py` and `data.db` stay only as the rollback copy. `data.db` is no longer updated.
+- Rollback: remove the `routes` entry from `cloudflare/wrangler.jsonc` and push (if you deleted the
+  route in the dashboard, remove it from `wrangler.jsonc` too). Move the two plists back to
+  `~/Library/LaunchAgents`, then run `launchctl bootstrap gui/$(id -u) <plist>` for each.
+  D1 changes since the move are not in `data.db`.
+- Friend links: ask for the list from D1 (see `cloudflare/README.md`). Do not paste them anywhere.
 - Ayan's link has three profiles: Ayan (TEST001, black BMW 3 Series, TX), Friend Two (TEST002, grey
   VW Jetta, TX, needs an email), Friend Three (needs a car and an email). TX was assumed for both plates.
-- First real permit: TEST001, issued 2026-10-19 23:30, expires 2026-10-20 23:30. The first
-  automatic renewal has not happened yet. Watch the inbox and `logs/app.log` after 23:30.
-- Emails work (Gmail SMTP/IMAP with an app password). HTML styled to match the site.
 
 ## Open work, in order
 
-1. Watch the first renewal. Fix `worker.py` if the Results page differs on renewal.
-2. Done: `parking.endyland.com` via named tunnel. Pending: owner runs `launchd/install.sh`.
+1. Done: moved to the Cloudflare Worker on 2026-10-22. Watch the next renewal and the inbox.
+2. Done: the Mac login agents and tunnel are switched off. `launchd/install.sh` is no longer part
+   of the normal path.
 3. endyland.com restructure (done 2026-10-20, apex now serves the portfolio,
    repo github.com/abasheer-rion/endyland-portfolio, Pages project `endyland-portfolio`):
    - `endyland.com`: new portfolio site (minimal layout, animations, 3D). Needs the owner's name as
@@ -49,6 +55,6 @@ or credential changes. Real details only for registrations.
 
 ## Known limits
 
-- Flask dev server, single machine, single worker. Fine for a handful of people.
+- Fine for a handful of people.
 - The Review step's checkbox is an attestation that the details are accurate. The app ticks it for
   each registration, so profiles must hold real data.

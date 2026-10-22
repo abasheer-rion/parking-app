@@ -7,10 +7,31 @@ Friends open a private link, pick a saved profile, choose how many days, and the
 their car with the property, then renews it every day until the stay ends. It emails the
 confirmation code and QR code after each registration or renewal, and emails when a renewal fails.
 
-See HANDOFF.md for current status and open work. A Cloudflare Worker port, not live yet, is in
-`cloudflare/` (see `cloudflare/README.md`).
+## Where it runs
 
-## How it works
+Since 2026-10-22 it runs on the Cloudflare Worker `parking-app` (code in `cloudflare/`, see
+`cloudflare/README.md`). The route is `parking.endyland.com/*`, set in `cloudflare/wrangler.jsonc`.
+Data is in D1 `parking-app`. The Worker sends email through Gmail SMTP using the secrets
+`GMAIL_USER` and `GMAIL_APP_PASSWORD`. Registrations are on (`PAUSE_REGISTRATIONS` is 0).
+
+The Mac copy (`app.py`, `worker.py`, `data.db`) is switched off and kept only as the rollback copy.
+`data.db` is no longer updated. See HANDOFF.md for status and open work.
+
+## Deploys and backups
+
+- Push to `main`. The GitHub Actions workflow "Deploy Worker" deploys the Worker.
+- Nightly D1 backups run in GitHub Actions (`backup.yml`).
+
+## Rollback to the Mac
+
+1. Remove the `routes` entry from `cloudflare/wrangler.jsonc` and push. If you deleted the route in
+   the dashboard instead, also remove it from `wrangler.jsonc` so the next deploy does not bring it back.
+2. Move `launchd/disabled/com.endyland.parking-app.plist` and
+   `launchd/disabled/com.endyland.parking-tunnel.plist` back to `~/Library/LaunchAgents`.
+3. Run `launchctl bootstrap gui/$(id -u) <plist>` for each.
+4. Data written to D1 since the move is not in `data.db`. Export it first if you need it.
+
+## How the Mac copy works (rollback only)
 
 - `app.py`: Flask site, SQLite (`data.db`), scheduler thread, emails.
 - `worker.py`: Playwright drives the property's form in headless Chromium.
@@ -36,7 +57,7 @@ The page is ASP.NET WebForms, so a plain HTTP replay is not practical. Note: `_b
 detached clone, which includes hidden validator text, so do not judge success from it. Use the
 QR element and the confirmation code instead.
 
-## Setup
+## Mac setup (rollback only)
 
     python3 -m venv .venv
     .venv/bin/pip install -r requirements.txt
@@ -53,19 +74,16 @@ Create `.env.sh` (mode 600, git-ignored):
     export MAX_DAYS=14
     # optional: PROPERTY, UNIT, PORT (default 8080), WORKER=mock for testing without the browser
 
-## Run
+## Run the Mac copy (rollback only)
 
-    ./start.sh                                   # app + temporary tunnel, prints the public URL
+    ./start.sh                                   # app + temporary tunnel (only during a rollback)
     source .env.sh && .venv/bin/python3 app.py add-friend "Name"   # prints a private link
     .venv/bin/python3 app.py list
     .venv/bin/python3 app.py seed "Friend" "Name|email|PLATE|TX|Make|Model|Color" ...
 
-## Deploy
+## Tests
 
 - CI runs the smoke tests on every push and pull request. It never opens a browser.
-- To ship on the Mac, run `scripts/update.sh`. It pulls, installs `requirements.txt`, checks the code
-  compiles and restarts the app. It refuses if the folder has local changes, or if a renewal is
-  running or due in the next 10 minutes.
 - Run the tests locally: `pip install -r requirements.txt -r requirements-dev.txt && pytest -q tests`.
   They use a temp database and the mock worker, so they never touch the property's site.
 
