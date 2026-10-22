@@ -18,7 +18,7 @@ Read README.md first. This file is what is running, what is pending, and the dec
   route in the dashboard, remove it from `wrangler.jsonc` too). Move the two plists back to
   `~/Library/LaunchAgents`, then run `launchctl bootstrap gui/$(id -u) <plist>` for each.
   D1 changes since the move are not in `data.db`.
-- Friend links: ask for the list from D1 (see `cloudflare/README.md`). Do not paste them anywhere.
+- To add a friend: `cloudflare/scripts/add-friend.sh "Name" --remote`. Existing links stay the same. Do not paste them anywhere.
 - Ayan's link has three profiles: Ayan (TEST001, black BMW 3 Series, TX), Friend Two (TEST002, grey
   VW Jetta, TX, needs an email), Friend Three (needs a car and an email). TX was assumed for both plates.
 
