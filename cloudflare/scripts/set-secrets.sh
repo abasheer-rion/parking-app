@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 ENV_FILE="${1:-../.env.sh}"
 [[ -f "$ENV_FILE" ]] || { echo "No $ENV_FILE"; exit 1; }
-: "${CLOUDFLARE_API_TOKEN:=$(vault get cloudflare-api-token)}"
+CLOUDFLARE_API_TOKEN="$(vault get cloudflare-deploy-token)"
 export CLOUDFLARE_API_TOKEN
 export CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-ba15337853352a33fd60d311715146c1}"
 

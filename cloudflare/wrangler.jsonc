@@ -7,6 +7,7 @@
   "compatibility_flags": ["nodejs_compat"],
   // Only the workers.dev address for now. Cutover adds a route for parking.endyland.com (see README).
   "workers_dev": true,
+  "routes": [{ "pattern": "parking.endyland.com/*", "zone_name": "endyland.com" }],
   "preview_urls": false,
   "triggers": { "crons": ["* * * * *"] },
   "browser": { "binding": "BROWSER" },
@@ -24,7 +25,7 @@
     "UNIT": "101",
     "FROM_NAME": "Park With Love (no reply)",
     // "1" until cutover: the Mac app is still the one that registers cars.
-    "PAUSE_REGISTRATIONS": "1"
+    "PAUSE_REGISTRATIONS": "0"
   },
   "observability": { "enabled": true }
 }

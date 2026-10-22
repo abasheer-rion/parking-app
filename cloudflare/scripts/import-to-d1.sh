@@ -15,7 +15,7 @@ MODE=("$@")
 [[ ${#MODE[@]} -gt 0 ]] || MODE=(--local)
 
 if [[ " ${MODE[*]} " == *" --remote "* ]]; then
-  : "${CLOUDFLARE_API_TOKEN:=$(vault get cloudflare-api-token)}"
+  CLOUDFLARE_API_TOKEN="$(vault get cloudflare-deploy-token)"
   export CLOUDFLARE_API_TOKEN
   export CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-ba15337853352a33fd60d311715146c1}"
   if [[ "${YES:-}" != "1" ]]; then
