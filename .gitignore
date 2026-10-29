@@ -24,3 +24,4 @@ launchd/disabled/
 
 # private notes: real profiles, plates, addresses
 HANDOFF.local.md
+_cloudflare-rules-backup/
