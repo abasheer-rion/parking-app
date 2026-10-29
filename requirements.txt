@@ -10,5 +10,5 @@ MarkupSafe==3.0.4
 Werkzeug==3.1.9
 # playwright deps
 greenlet==3.5.6
-pyee==14.0.0
+pyee==16.0.0
 typing_extensions==4.16.0
