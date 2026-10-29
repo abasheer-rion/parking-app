@@ -6,7 +6,7 @@ import type { Job } from "../src/db";
 import { env, loadFixture, QR_BYTES } from "./helpers";
 
 beforeEach(loadFixture);
-const PLACE = "SAMPLE COURT, unit 101";
+const PLACE = "Sample Court, unit 101";
 
 async function row(id: number): Promise<Job> {
   return (await env.DB.prepare("SELECT * FROM jobs WHERE id=?").bind(id).first<Job>())!;

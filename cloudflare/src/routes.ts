@@ -1,8 +1,8 @@
 // Every route of the Flask app, same paths, same HTML, same redirects and headers.
-import { friendByToken, JOB_COLS, type Friend, type Job, type Profile } from "./db";
+import { friendByToken, getMeta, JOB_COLS, type Friend, type Job, type Profile } from "./db";
 import type { Env } from "./env";
-import { settings } from "./env";
-import { BAD_REQUEST, NOT_ALLOWED, NOT_FOUND, pyTitle, redirectBody, renderPage, type PastStay } from "./page";
+import { placeOf, settings } from "./env";
+import { APP_JS, BAD_REQUEST, NOT_ALLOWED, NOT_FOUND, pyTitle, redirectBody, renderHome, renderPage, type PastStay } from "./page";
 import { now } from "./time";
 
 const CSP = "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
@@ -10,7 +10,7 @@ const CSP = "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.
   "form-action 'self'; base-uri 'none'";
 const HTML = "text/html; charset=utf-8";
 
-/** Private tool: keep it out of search engines and other sites' frames. */
+/** Keep it out of search engines and other sites' frames. */
 function harden(res: Response, path: string): Response {
   const h = res.headers;
   h.set("X-Robots-Tag", "noindex, nofollow");
@@ -87,7 +87,7 @@ async function page(env: Env, f: Friend, notice: string | null = null, error: st
     friend: f, profiles: profiles.results as unknown as Profile[], active: active.results as unknown as (Job & { has_qr: number })[],
     past: past.results as unknown as PastStay[],
     lastEmail: recent.results.length ? (last ?? "None") : "", notice, error,
-    maxDays: s.maxDays, unit: s.unit, prop: pyTitle(s.property),
+    maxDays: s.maxDays, unit: placeOf(env, f).unit, prop: pyTitle(placeOf(env, f).property),
   }));
 }
 
@@ -210,6 +210,48 @@ const ROUTES: Route[] = [
   },
 ];
 
+/** Property names the last dropdown check saw, to suggest on the home page. */
+async function knownProperties(env: Env): Promise<string[]> {
+  try {
+    const r = JSON.parse((await getMeta(env.DB, "dry_run_result")) ?? "{}") as { options?: string[] };
+    return (r.options ?? []).filter((o) => o && !/^select/i.test(o)).slice(0, 500);
+  } catch { return []; }
+}
+
+function newToken(): string {
+  const b = crypto.getRandomValues(new Uint8Array(18));
+  return btoa(String.fromCharCode(...b)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+const pagesKey = () => "new_pages:" + new Date().toISOString().slice(0, 10);
+
+/** Public sign-up, capped per day. Logs every page it makes. */
+async function home(env: Env, req: Request, method: string): Promise<Response> {
+  const cap = Math.max(0, parseInt(env.MAX_NEW_PAGES ?? "30", 10) || 0);
+  const made = parseInt((await getMeta(env.DB, pagesKey())) ?? "0", 10) || 0;
+  if (method === "GET") return html(renderHome({ properties: await knownProperties(env), full: made >= cap }));
+  const form = await readForm(req);
+  const name = (form.get("name") ?? "").trim().slice(0, 60);
+  const property = (form.get("property") ?? "").trim().toUpperCase().slice(0, 80);
+  const unit = (form.get("unit") ?? "").trim().slice(0, 20);
+  const props = await knownProperties(env);
+  const again = (error: string) => html(renderHome({ properties: props, error, full: made >= cap }), 400);
+  if (!name || !property || !unit) return again("Add your name, property and unit.");
+  if (form.get("ok") !== "1") return again("Tick the box to confirm the details are accurate.");
+  if (props.length && !props.includes(property)) return again("Pick the property exactly as it shows in the list.");
+  // Count first, so two requests at once cannot both slip past the cap.
+  const r = await env.DB.prepare("INSERT INTO meta(key,value) VALUES(?, '1') ON CONFLICT(key) DO UPDATE SET " +
+    "value=CAST(CAST(meta.value AS INTEGER)+1 AS TEXT) WHERE CAST(meta.value AS INTEGER) < ? RETURNING value")
+    .bind(pagesKey(), cap).first<{ value: string }>();
+  if (!r) return html(renderHome({ properties: props, full: true }), 429);
+  const token = newToken();
+  await env.DB.prepare("INSERT INTO friends(token,name,property,unit,created_ts) VALUES(?,?,?,?,?)")
+    .bind(token, name, property, unit, now()).run();
+  console.log("[signup]", JSON.stringify({ at: new Date().toISOString(), property, today: Number(r.value),
+    ip: req.headers.get("CF-Connecting-IP") ?? "" }));
+  return redirectHome(token);
+}
+
 function decode(seg: string): string | null {
   try { return decodeURIComponent(seg); } catch { return null; }
 }
@@ -242,6 +284,16 @@ async function route(req: Request, env: Env, path: string): Promise<Response> {
     if (method === "OPTIONS") return new Response("", { headers: { Allow: "GET, HEAD, OPTIONS" } });
     if (method !== "GET") return errorResponse(405, "GET, HEAD, OPTIONS");
     return new Response("User-agent: *\nDisallow: /\n", { headers: { "Content-Type": "text/plain" } });
+  }
+  if (path === "/app.js") {
+    if (method !== "GET") return errorResponse(405, "GET, HEAD, OPTIONS");
+    return new Response(APP_JS, { headers: { "Content-Type": "text/javascript; charset=utf-8", "Cache-Control": "max-age=300" } });
+  }
+  if (path === "/" || path === "/start") {
+    const allow = path === "/" ? "GET, HEAD, OPTIONS" : "OPTIONS, POST";
+    if (method === "OPTIONS") return new Response("", { headers: { Allow: allow } });
+    if (method !== (path === "/" ? "GET" : "POST")) return errorResponse(405, allow);
+    return home(env, req, method);
   }
   for (const r of ROUTES) {
     const m = r.re.exec(path);

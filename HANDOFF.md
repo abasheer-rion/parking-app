@@ -1,4 +1,4 @@
-# Handoff (as of 2026-10-22)
+# Handoff (as of 2026-10-29)
 
 Read README.md first. This file is what is running, what is pending, and the decisions behind it.
 
@@ -19,8 +19,17 @@ Read README.md first. This file is what is running, what is pending, and the dec
   `~/Library/LaunchAgents`, then run `launchctl bootstrap gui/$(id -u) <plist>` for each.
   D1 changes since the move are not in `data.db`.
 - To add a friend: `cloudflare/scripts/add-friend.sh "Name" --remote`. Existing links stay the same. Do not paste them anywhere.
-- Ayan's link has three profiles: Ayan (TEST001, black BMW 3 Series, TX), Friend Two (TEST002, grey
-  VW Jetta, TX, needs an email), Friend Three (needs a car and an email). TX was assumed for both plates.
+- Real profiles, plates and the owner's property are in `HANDOFF.local.md` (git-ignored, Mac only).
+
+## Public sign-up (2026-10-29)
+
+- `/` is a public form: name, property (exact registermyplate.com label), unit, and an accuracy box.
+  It makes a page with its own property and unit and sends the person there. `/app.js` stores the
+  page in the browser (localStorage), so that device goes straight to it next time.
+- Cap: `MAX_NEW_PAGES` new pages a day (default 30). Every sign-up is logged as `[signup]`.
+- Pages made before this have no property of their own and use the `PROPERTY` and `UNIT`
+  Worker secrets. Those are not in the repo.
+- The firewall rule "parking: only the app paths" must allow `/`, `/start` and `/app.js`.
 
 ## Open work, in order
 
@@ -32,7 +41,7 @@ Read README.md first. This file is what is running, what is pending, and the dec
    - `endyland.com`: new portfolio site (minimal layout, animations, 3D). Needs the owner's name as
      shown, LinkedIn, GitHub, projects and quick links.
    - `movie.endyland.com`: the existing P-Stream fork, today on Pages project `p-stream` in the
-     owner@example.com Cloudflare account, with `api.endyland.com` and `proxy.endyland.com`.
+     owner's Cloudflare account, with `api.endyland.com` and `proxy.endyland.com`.
    - `parking.endyland.com`: this app.
    Safe order: record current DNS and Pages domains, add `movie.` to `p-stream`, allow the new
    origin on the api and proxy, build and deploy the portfolio, then move the apex and www.

@@ -35,6 +35,21 @@ function run(driver: MockDriver, now = T, e: Env = env, canLaunch?: () => Promis
 }
 
 describe("scheduler rules, same as app.py", () => {
+  it("a page's own property and unit win over the Worker settings", async () => {
+    await env.DB.prepare("UPDATE friends SET property='OTHER PLACE', unit='7' WHERE id=1").run();
+    await addJob({});
+    const d = new MockDriver(() => ok());
+    await run(d);
+    expect(d.calls[0]).toMatchObject({ property: "OTHER PLACE", unit: "7" });
+    expect(sent[0].body).toContain("Other Place, unit 7");
+  });
+  it("with no property anywhere it counts a failed try and never opens the browser", async () => {
+    const id = await addJob({});
+    const d = new MockDriver(() => ok());
+    await run(d, T, { ...env, PROPERTY: "", UNIT: "" } as Env);
+    expect(d.calls).toHaveLength(0);
+    expect(await job(id)).toMatchObject({ fails: 1, error: "This page has no property or unit set." });
+  });
   it("registers a new pending job, stores code and QR, emails 'confirmed'", async () => {
     const id = await addJob({});
     const d = new MockDriver(() => ok());

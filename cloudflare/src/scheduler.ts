@@ -4,10 +4,10 @@
 // - otherwise mark the job done once the last permit has run out
 // - a failure retries 10 minutes later, up to 5 tries, emailing on the 1st and the 5th
 import { dropLock, getJob, takeLock, type Job } from "./db";
-import type { Driver } from "./driver";
+import type { Driver, Result } from "./driver";
 import { failureMail, successMail } from "./emails";
 import type { Env } from "./env";
-import { settings } from "./env";
+import { placeOf } from "./env";
 import { pyTitle } from "./page";
 import { now as clockNow } from "./time";
 import type { Mail } from "./emails";
@@ -36,11 +36,15 @@ export async function runRegistration(env: Env, deps: TickDeps, jobId: number): 
   if (!j || !["pending", "active"].includes(j.status)) return;
   if (j.expires_ts && now() < j.expires_ts) return; // still covered, nothing to do
   const first = j.last_ok_ts === null;
-  const { property, unit } = settings(env);
-  const r = await deps.driver.register({
-    vehicle: { plate: j.plate, state: j.state, make: j.make, model: j.model, color: j.color },
-    email: j.email, property, unit,
-  });
+  const owner = await env.DB.prepare("SELECT property, unit FROM friends WHERE id=?").bind(j.friend_id)
+    .first<{ property: string | null; unit: string | null }>();
+  const { property, unit } = placeOf(env, owner ?? {});
+  // No place to register at (page has none and no fallback is set): count it as a failed try.
+  const r: Result = !property || !unit ? { ok: false, message: "This page has no property or unit set." }
+    : await deps.driver.register({
+      vehicle: { plate: j.plate, state: j.state, make: j.make, model: j.model, color: j.color },
+      email: j.email, property, unit,
+    });
   const t = now();
   // A "Done staying" press while the browser ran wins: only update a row that is still live.
   if (r.ok) {

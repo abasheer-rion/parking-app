@@ -49,7 +49,7 @@ describe("headers and simple routes", () => {
     }
   });
   it("unknown token, trailing slash and other paths are 404", async () => {
-    for (const p of ["/u/not-a-real-token", "/u/tok-alpha-123/", "/u/tok-alpha-123/qr/abc", "/", "/wp-login.php", "/u/"]) {
+    for (const p of ["/u/not-a-real-token", "/u/tok-alpha-123/", "/u/tok-alpha-123/qr/abc", "/wp-login.php", "/u/", "/start/"]) {
       expect((await call(p)).status, p).toBe(404);
     }
   });

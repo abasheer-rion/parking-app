@@ -89,6 +89,7 @@ export function renderPage(d: PageData): string {
 <!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Guest parking</title>
+<script src="/app.js" defer></script>
 ${anyPending ? `<meta http-equiv="refresh" content="6">` : ""}
 ${HEAD_STYLE}<h1><span class="heart">♥</span> Park With Love <span class="heart">♥</span></h1><p class="sub">Hi ${e(d.friend.name)}, saving you a spot at ${e(d.prop)}, unit ${e(d.unit)}</p>
 
@@ -213,3 +214,53 @@ export function redirectBody(loc: string): string {
 <p>You should be redirected automatically to the target URL: <a href="${l}">${l}</a>. If not, click the link.
 `;
 }
+
+/** Public home page: anyone makes their own page. The browser remembers it (see APP_JS). */
+export function renderHome(d: { properties: string[]; error?: string | null; full?: boolean }): string {
+  const opts = d.properties.map((p) => `<option value="${e(p)}">`).join("");
+  return `<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guest parking</title>
+<script src="/app.js" defer></script>
+${HEAD_STYLE}<h1><span class="heart">♥</span> Park With Love <span class="heart">♥</span></h1><p class="sub">Guest parking that renews itself every day</p>
+${d.error ? `<div class="card"><span class="bad">${e(d.error)}</span></div>` : ""}
+<div class="card"><b class="t">♥ Get started</b>
+<p class="mut">Enter your place once. This device remembers it, so next time you land right on your page.
+Your cars and email are saved on your page.</p>
+${d.full ? `<p class="bad">New pages are full for today. Try again tomorrow.</p>` : `<form method="post" action="/start">
+ <label>Your name</label><input name="name" required maxlength="60" autocomplete="name">
+ <label>Property, exactly as registermyplate.com lists it</label><input name="property" required maxlength="80" list="props" autocapitalize="characters">
+ <datalist id="props">${opts}</datalist>
+ <label>Apartment / unit</label><input name="unit" required maxlength="20">
+ <label><input type="checkbox" name="ok" value="1" required style="width:auto"> The details I enter are accurate, and I live there or have the resident's OK</label>
+ <button>Make my page ♥</button></form>`}</div>
+</main></body></html>`;
+}
+
+/** Remembers this device's page in localStorage. Served from /app.js because the CSP blocks inline scripts. */
+export const APP_JS = `(function () {
+  var KEY = "parking.page";
+  function get() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function set(v) { try { if (v) localStorage.setItem(KEY, v); else localStorage.removeItem(KEY); } catch (e) {} }
+  var m = location.pathname.match(/^\\/u\\/([^/]+)$/);
+  if (m) {
+    set(m[1]);
+    document.addEventListener("DOMContentLoaded", function () {
+      var main = document.querySelector("main");
+      if (!main) return;
+      var p = document.createElement("p");
+      p.className = "sub";
+      var a = document.createElement("a");
+      a.href = "/";
+      a.textContent = "Not you? Forget this device";
+      a.style.color = "#fff";
+      a.addEventListener("click", function () { set(null); });
+      p.appendChild(a);
+      main.appendChild(p);
+    });
+  } else if (location.pathname === "/") {
+    var saved = get();
+    if (saved && /^[A-Za-z0-9_-]+$/.test(saved)) location.replace("/u/" + saved);
+  }
+})();
+`;

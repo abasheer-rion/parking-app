@@ -1,4 +1,4 @@
-"""Guest parking registration app for SAMPLE COURT, unit 101.
+"""Guest parking registration app (property and unit come from PROPERTY and UNIT).
 
 Run:   python app.py                      (starts the site and the renewal job)
 Admin: python app.py add-friend "Name"    (prints that friend's private link)

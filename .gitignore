@@ -21,3 +21,6 @@ __pycache__/
 
 # plists moved out of ~/Library/LaunchAgents at cutover
 launchd/disabled/
+
+# private notes: real profiles, plates, addresses
+HANDOFF.local.md

@@ -12,8 +12,8 @@ from datetime import datetime
 import email as emaillib
 
 URL = "https://registermyplate.com/visitors/"
-PROPERTY = os.environ.get("PROPERTY", "SAMPLE COURT")
-UNIT = os.environ.get("UNIT", "101")
+PROPERTY = os.environ.get("PROPERTY", "")
+UNIT = os.environ.get("UNIT", "")
 M = "ctl00$MainContent$"
 LOGDIR = os.path.join(os.path.dirname(__file__), "logs")
 

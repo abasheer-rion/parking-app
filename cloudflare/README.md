@@ -82,14 +82,15 @@ Run once, yourself: `scripts/set-secrets.sh`. It reads `GMAIL_USER`, `GMAIL_APP_
 present, `NOTIFY_ALSO` from `../.env.sh` and pipes each into `wrangler secret put`. Nothing is printed.
 Without them the Worker logs "mail skipped" and carries on.
 
-`FROM_NAME`, `MAX_DAYS`, `PROPERTY` and `UNIT` are plain settings in `wrangler.jsonc`.
+`FROM_NAME`, `MAX_DAYS` and `MAX_NEW_PAGES` are plain settings in `wrangler.jsonc`. `PROPERTY` and `UNIT` (fallback for
+pages made before public sign-up) are Worker secrets: `npx wrangler secret put PROPERTY`.
 
 ## Dry run
 
 `scripts/dry-run.sh` loads the property's start page once in Browser Run and lists the property
 dropdown. It fills nothing and clicks nothing. It runs the Worker with `wrangler dev --remote` and
 fires its cron handler with `DRY_RUN_ONCE` set. There is no public route for it.
-Last result (2026-10-20): 97 options, "SAMPLE COURT" found, 2.4 browser seconds.
+Last result (2026-10-20): 97 options, the property was found, 2.4 browser seconds.
 
 ## Test friend
 

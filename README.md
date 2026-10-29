@@ -1,9 +1,11 @@
 # Park With Love
 
-Guest parking registration for SAMPLE COURT, unit 101 (Austin), through the property's
+Guest parking registration through a property's
 visitor form at registermyplate.com/visitors/ (run by A & A Wrecker and Recovery).
 
-Friends open a private link, pick a saved profile, choose how many days, and the app registers
+Anyone can open the home page, enter their name, property and unit, and get their own page.
+Their browser remembers that page, so next time they land right on it. Friends with a private link work the same way.
+They pick a saved profile, choose how many days, and the app registers
 their car with the property, then renews it every day until the stay ends. It emails the
 confirmation code and QR code after each registration or renewal, and emails when a renewal fails.
 
@@ -43,7 +45,7 @@ The Mac copy (`app.py`, `worker.py`, `data.db`) is switched off and kept only as
 
 ## The property's form, step by step
 
-1. Property: dropdown, pick `SAMPLE COURT`.
+1. Property: dropdown, pick the property by its exact label.
 2. Products: one option, "Guest Parking - Default", free, 24 hours.
 3. Apartment: unit number.
 4. Vehicle: plate, make, model, color, state (two-letter value).
@@ -90,7 +92,6 @@ Create `.env.sh` (mode 600, git-ignored):
 ## Testing tools
 
 - `dryrun.py PLATE STATE MAKE MODEL COLOR EMAIL`: stops at the Contact step, submits nothing.
-- `explore.py`: walks every step and stops before the final button, printing each page.
 - `submit_test.py ...`: does a real registration. Use real details only.
 - `WORKER=mock`: the app runs without touching the property's site.
 

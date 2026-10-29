@@ -1,4 +1,4 @@
-export interface Friend { id: number; token: string; name: string }
+export interface Friend { id: number; token: string; name: string; property?: string | null; unit?: string | null }
 export interface Profile {
   id: number; friend_id: number; name: string; email: string | null; plate: string | null;
   state: string | null; make: string | null; model: string | null; color: string | null;

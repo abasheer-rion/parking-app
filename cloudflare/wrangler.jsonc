@@ -21,8 +21,8 @@
   ],
   "vars": {
     "MAX_DAYS": "14",
-    "PROPERTY": "SAMPLE COURT",
-    "UNIT": "101",
+    // PROPERTY and UNIT (fallback for pages made before public sign-up) are Worker secrets, not vars.
+    "MAX_NEW_PAGES": "30",
     "FROM_NAME": "Park With Love (no reply)",
     // "1" until cutover: the Mac app is still the one that registers cars.
     "PAUSE_REGISTRATIONS": "0"
